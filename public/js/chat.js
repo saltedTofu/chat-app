@@ -3,7 +3,6 @@ let userID='user';
 let currentUsers=['user'];
 
 function setCurrentUsersLocal(){
-    console.log(currentUsers)
     const currentUsersDiv = document.querySelector('.currentUsers')
     while(currentUsersDiv.firstChild){ //empties out list
         currentUsersDiv.removeChild(currentUsersDiv.firstChild)
@@ -19,17 +18,23 @@ document.querySelector('#dogFactButton').addEventListener('click',()=>{
 
 })
 
+socket.on('previousMessages', (previousMessages)=>{
+    for(let i=0;i<previousMessages.length;i++){
+        let messageNode = document.createElement('p')
+        messageNode.innerHTML = `${previousMessages[i].sender}: ${previousMessages[i].text}`
+        document.querySelector('#chatHistory').prepend(messageNode);
+    }
+})
 
 socket.on('newMessage', (message)=>{ //when a message is received from server
     let messageNode = document.createElement('p');
     messageNode.innerHTML = message;
-    document.querySelector('#chatHistory')?.prepend(messageNode);
+    document.querySelector('#chatHistory').prepend(messageNode);
 })
 
 socket.on('updateUsers',(currentUsersOnServer)=>{
     //iterate through map and get the values
     currentUsers=[]
-    console.log(currentUsersOnServer)
     for(const socketID in currentUsersOnServer){
         currentUsers.push(currentUsersOnServer[socketID])
     }
@@ -37,7 +42,6 @@ socket.on('updateUsers',(currentUsersOnServer)=>{
 })
 const messageForm = document.querySelector('#message')
 messageForm.addEventListener('submit', (event) => { //send a message to server
-    console.log(event)
     event.preventDefault()
     const {target} = event
     if(target){
